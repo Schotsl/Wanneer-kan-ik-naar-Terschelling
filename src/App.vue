@@ -36,6 +36,7 @@
           { color: '#550000', title: 'Geert, Anoesjka, Timo en Mattijn', start: '2020-07-04', end: '2020-07-14' },
           { color: '#D46A6A', title: 'Anne-Marie, Jan Willem, Sjors, Max en Pim', start: '2020-07-16', end: '2020-07-30' },
           { color: '#550000', title: 'Geert, Anoesjka, Timo en Mattijn', start: '2020-07-29', end: '2020-08-03' },
+          { color: '#550000', title: 'Mattijn en vrienden', start: '2020-08-07', end: '2020-08-15' },
         ]
       }
     },
