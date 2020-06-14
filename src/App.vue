@@ -8,6 +8,8 @@
   import FullCalendar from '@fullcalendar/vue';
   import dayGridPlugin from '@fullcalendar/daygrid';
 
+  import calendarData from './data.json';
+
   export default {
     name: 'App',
 
@@ -25,19 +27,7 @@
         // Anne-Marie: #D46A6A
         // Oma: #FFAAAA
 
-        calendarPlugins: [ dayGridPlugin ],
-        calendarData: [
-          // Added a single day to every end day
-          { color: '#7e2624', title: 'Timo, Mattijn en Sjors', start: '2020-06-08', end: '2020-06-16' },
-          { color: '#D46A6A', title: 'Max en Pim', start: '2020-06-15', end: '2020-06-22' },
-          { color: '#801515', title: 'Carola', start: '2020-06-27', end: '2020-06-29' },
-          { color: '#D46A6A', title: 'Pim', start: '2020-06-28', end: '2020-06-31' },
-          { color: '#801515', title: 'Ingmar', start: '2020-06-30', end: '2020-07-05' },
-          { color: '#550000', title: 'Geert, Anoesjka, Timo en Mattijn', start: '2020-07-04', end: '2020-07-14' },
-          { color: '#D46A6A', title: 'Anne-Marie, Jan Willem, Sjors, Max en Pim', start: '2020-07-16', end: '2020-07-30' },
-          { color: '#550000', title: 'Geert, Anoesjka, Timo en Mattijn', start: '2020-07-29', end: '2020-08-03' },
-          { color: '#550000', title: 'Mattijn en vrienden', start: '2020-08-07', end: '2020-08-15' },
-        ]
+        calendarPlugins: [ dayGridPlugin ]
       }
     },
 
