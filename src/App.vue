@@ -27,6 +27,7 @@
         // Anne-Marie: #D46A6A
         // Oma: #FFAAAA
 
+        calendarData: calendarData,
         calendarPlugins: [ dayGridPlugin ]
       }
     },
