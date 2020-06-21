@@ -4,9 +4,9 @@
   { "color": "#801515", "title": "Carola en familie", "start": "2020-06-27", "end": "2020-06-29" },
   { "color": "#D46A6A", "title": "Pim en vrienden", "start": "2020-06-28", "end": "2020-06-31" },
   { "color": "#801515", "title": "Ingmar en vrienden", "start": "2020-06-30", "end": "2020-07-05" },
-  { "color": "#550000", "title": "Geert en familie", "start": "2020-07-04", "end": "2020-07-14" },
+  { "color": "#550000", "title": "Geert en familie", "start": "2020-07-04", "end": "2020-07-11" },
   { "color": "#D46A6A", "title": "Anne-Marie en familie", "start": "2020-07-16", "end": "2020-07-30" },
-  { "color": "#550000", "title": "Geert en familie", "start": "2020-07-29", "end": "2020-08-03" },
   { "color": "#801515", "title": "Carola en familie", "start": "2020-08-03", "end": "2020-08-17" },
-  { "color": "#550000", "title": "Mattijn en vrienden", "start": "2020-08-17", "end": "2020-08-25" }
+  { "color": "#550000", "title": "Mattijn en vrienden", "start": "2020-08-17", "end": "2020-08-25" },
+  { "color": "#550000", "title": "Hageman", "start": "2020-09-21", "end": "2020-09-26" }
 ]
