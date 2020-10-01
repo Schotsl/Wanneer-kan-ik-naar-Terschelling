@@ -1,8 +1,8 @@
 <template>
   <div id="app">
-    <Window></Window>
+    <Window :open="modalOpen" @closed="closeModal"></Window>
     <FullCalendar defaultView="dayGridMonth" :events="calendarData" :height=calendarHeight :plugins="calendarPlugins" />
-    <Add></Add>
+    <Add @click="openModal"></Add>
   </div>
 </template>
 
@@ -28,6 +28,7 @@
       return {
         width: 0,
         height: 0,
+        modalOpen: false,
 
         // Carola: #801515
         // Geert: #550000
@@ -54,6 +55,12 @@
       onResize() {
         this.width = window.innerWidth;
         this.height = window.innerHeight;
+      },
+      openModal() {
+        this.modalOpen = true;
+      },
+      closeModal() {
+        this.modalOpen = false;
       }
     },
 

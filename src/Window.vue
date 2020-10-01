@@ -1,6 +1,6 @@
 <template>
   <div id="window">
-    <modal name="modal" classes="modal" height="auto">
+    <modal name="modal" classes="modal" height="auto" @closed="$emit('closed')">
 
       <div class="container">
         <span class="title">Start datum</span>
@@ -68,6 +68,10 @@
       }
     },
 
+    props: {
+      open: Boolean,
+    },
+
     components: {
       DatePicker,
     },
@@ -86,16 +90,9 @@
       }
     },
 
-    mounted() {
-      this.show();
-    },
-
-    methods: {
-      show () {
-        this.$modal.show('modal');
-      },
-      hide () {
-        this.$modal.hide('modal');
+    watch: {
+      open: function() {
+        if (this.open) this.$modal.show('modal');
       }
     }
   }
