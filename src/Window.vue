@@ -1,70 +1,80 @@
 <template>
   <div id="window">
     <modal name="modal" classes="modal" height="auto" @closed="$emit('closed')">
+      
+      <Spinner v-if="loading"></Spinner>
 
-      <div class="container">
-        <span class="title">Start datum</span>
-        <date-picker v-model="start"></date-picker>
-        <span class="description">De start datum van de vakantie</span>
-      </div>
+      <div :class="{ loading : loading }">
+        <TextInput :loading="loading" @change="updateName" header="Eind datum" subtitle="De eind datum van de vakantie" :error="errors.name"></TextInput>
+        <DateInput :loading="loading" @change="updateStart" header="Eind datum" subtitle="De eind datum van de vakantie" :error="errors.start"></DateInput>
+        <DateInput :loading="loading" @change="updateEnding" header="Eind datum" subtitle="De eind datum van de vakantie" :error="errors.ending"></DateInput>
 
-      <div class="container">
-        <span class="title">Eind datum</span>
-        <date-picker v-model="ending"></date-picker>
-        <span class="description">De eind datum van de vakantie</span>
-      </div>
+        <div class="line"></div>
 
-      <div class="container">
-        <span class="title">Titel</span>
-        <input type="text" v-model="name">
-        <span class="description">De titel van het vakantie blok</span>
-      </div>
-
-      <div class="line"></div>
-
-      <div class="container">
         <span class="title">Familie(s)</span><br/>
         <span class="description">Welke families gaan op vakantie</span><br/>
 
-        <div style="margin-top: 5px;">
-          <input type="checkbox" id="holst" name="holst" v-model="holst">
-          <label for="holst" class="title"> van Holst / Steenmeijer</label><br>
-          <input type="checkbox" id="steenmeijer" name="steenmeijer" v-model="steenmeijer">
-          <label for="steenmeijer" class="title"> Steenmeijer / Anoesjka</label><br>
-          <input type="checkbox" id="hartman" name="hartman" v-model="hartman">
-          <label for="hartman" class="title"> Hartman / Steenmeijer</label><br>
-          <input type="checkbox" id="other" name="other" v-model="other">
-          <label for="other" class="title"> Anders..</label><br>
-        </div>
-      </div>
+        <input type="checkbox" id="holst" v-model="family.holst">
+        <label for="holst" class="title"> van Holst / Steenmeijer</label><br>
 
-      <div class="line"></div>
-      <button class="fc-button-primary">Vakantie toevoegen</button>
-      
+        <input type="checkbox" id="steenmeijer" v-model="family.steenmeijer">
+        <label for="steenmeijer" class="title"> Steenmeijer / Anoesjka</label><br>
+
+        <input type="checkbox" id="hartman" v-model="family.hartman">
+        <label for="hartman" class="title"> Hartman / Steenmeijer</label><br>
+
+        <input type="checkbox" id="other" v-model="family.other">
+        <label for="other" class="title"> Anders..</label><br>
+
+        <div class="line"></div>
+
+        <button :disabled="loading" class="fc-button-primary" @click="createVacation">Vakantie toevoegen</button>
+      </div>
     </modal>
   </div>
 </template>
 
 <script>
   import 'vue-js-modal/dist/styles.css';
-  import 'vue2-datepicker/index.css';
 
-  import DatePicker from 'vue2-datepicker';
+  import TextInput from './Text';
+  import DateInput from './Date';
+  import Spinner from './Spinner';
+
+
+  import axios from 'axios';
 
   export default {
     name: 'Window',
 
+    components: {
+      Spinner,
+      TextInput,
+      DateInput,
+    },
+
     data() {
       return {
-        name: ``,
-        color: ``,
-        start: ``,
-        ending: ``,
+        loading: false,
 
-        holst: false,
-        other: false,
-        hartman: false,
-        steenmeijer: false,
+        vacation: {
+          name: ``,
+          start: ``,
+          ending: ``,
+        },
+
+        errors: {
+          name: ``,
+          start: ``,
+          ending: ``,
+        },
+
+        family: {
+          holst: false,
+          other: false,
+          hartman: false,
+          steenmeijer: false,
+        },
       }
     },
 
@@ -72,21 +82,69 @@
       open: Boolean,
     },
 
-    components: {
-      DatePicker,
-    },
-
     computed: {
       averageColor: function() {
         const colorArray = [];
         const averageColor = require('@bencevans/color-array-average');
 
-        if (this.holst) colorArray.push(`#f8efd4`);
-        if (this.other) colorArray.push(`#edc988`);
-        if (this.hartman) colorArray.push(`#de4463`);
-        if (this.steenmeijer) colorArray.push(`#821752`);
+        if (this.family.holst) colorArray.push(`#f8efd4`);
+        if (this.family.other) colorArray.push(`#edc988`);
+        if (this.family.hartman) colorArray.push(`#de4463`);
+        if (this.family.steenmeijer) colorArray.push(`#821752`);
 
         return averageColor(colorArray);
+      },
+    },
+
+    methods: {
+      updateName(name) {
+        this.vacation.name = name;
+      },
+      updateStart(start) {
+        this.vacation.start = start;
+      },
+      updateEnding(ending) {
+        this.vacation.ending = ending;
+      },
+
+      resetErrors() {
+        this.errors.name = ``;
+        this.errors.start = ``;
+        this.errors.ending = ``;
+      },
+
+      validateInput() {
+        const validation = require('validator');
+
+        if (!validation.isLength(this.vacation.name, {'min': 3, 'max': 255})) this.errors.name = `Vul hier een titel in`;
+        if (!validation.isDate(this.vacation.ending)) this.errors.ending = `Vul hier een eind datum in`;
+        if (!validation.isDate(this.vacation.start)) this.errors.start = `Vul hier een start datum in`;
+
+        return this.errors.name.length === 0 &&
+               this.errors.start.length === 0 &&
+               this.errors.ending.length === 0;    
+      },
+
+      async createVacation() {
+        // Clear the old errors
+        this.resetErrors();
+
+        // Check for new errors
+        if (!this.validateInput()) return;
+
+        // Start the loading
+        this.loading = true;
+        this.vacation.color = this.averageColor;
+
+        // Send creation process
+        await axios({
+          url: `https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation`,
+          data: this.vacation,
+          method: `post`
+        });
+
+        // Once we're done loading disable spinner
+        this.loading = false;
       }
     },
 
@@ -99,6 +157,10 @@
 </script>
 
 <style>
+  .loading {
+    opacity: .15;
+  }
+
   #window button {
     width: 100%;
     color: white;
@@ -108,21 +170,6 @@
     text-align: center;
     font-weight: 100;
     border-radius: 5px;
-  }
-  
-  #window .title {
-    font-size: 18px;
-    font-weight: 300;
-  }
-
-  #window .container {
-    margin: 16px 0px;
-  }
-
-  #window .description {
-    opacity: .65;
-    font-size: 16px;
-    margin-bottom: 10px;
   }
 
   #window .line {
@@ -141,19 +188,5 @@
 
   #window .mx-icon-calendar {
     display: none;
-  }
-
-  #window input[type="text"] {
-    margin-top: 5px;
-    margin-bottom: 5px;
-    
-    height: auto !important;
-    padding: 12px 20px !important;
-    font-size: 18px !important;
-
-    width: 100%;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
   }
 </style>
