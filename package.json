@@ -8,12 +8,15 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@bencevans/color-array-average": "^1.0.1",
     "@fullcalendar/core": "^4.4.2",
     "@fullcalendar/daygrid": "^4.4.2",
     "@fullcalendar/vue": "^4.4.2",
     "core-js": "^3.6.5",
     "vue": "^2.6.11",
-    "vue-headful": "^2.1.0"
+    "vue-headful": "^2.1.0",
+    "vue-js-modal": "^2.0.0-rc.6",
+    "vue2-datepicker": "^3.6.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.4.0",

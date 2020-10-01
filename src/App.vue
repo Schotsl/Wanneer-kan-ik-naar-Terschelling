@@ -1,10 +1,15 @@
 <template>
   <div id="app">
+    <Window></Window>
     <FullCalendar defaultView="dayGridMonth" :events="calendarData" :height=calendarHeight :plugins="calendarPlugins" />
+    <Add></Add>
   </div>
 </template>
 
 <script>
+  import Add from './Add';
+  import Window from './Window';
+
   import FullCalendar from '@fullcalendar/vue';
   import dayGridPlugin from '@fullcalendar/daygrid';
 
@@ -14,7 +19,9 @@
     name: 'App',
 
     components: {
-      FullCalendar
+      FullCalendar,
+      Window,
+      Add,
     },
 
     data() {
