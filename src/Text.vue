@@ -44,24 +44,4 @@
     box-sizing: border-box;
     border: 1px solid #ccc;
   }
-
-  .text-input .header {
-    font-size: 20px;
-    font-weight: 300;
-  }
-
-  .text-input .subtitle,
-  .text-input .error {
-    opacity: .65;
-    font-size: 16px;
-    font-weight: 100;
-  }
-
-  .text-input .error {
-    color: #dc3545;
-  }
-
-  .text-input .border {
-    border-color: #dc3545
-  }
 </style>

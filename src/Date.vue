@@ -54,28 +54,12 @@
     border: 1px solid #ccc;
   }
 
-  .border input {
-    border-color: #dc3545;
-  }
-
-  .date-input .header {
-    font-size: 20px;
-    font-weight: 300;
-  }
-
-  .date-input .subtitle,
-  .date-input .error {
-    opacity: .65;
-    font-size: 16px;
-    font-weight: 100;
-  }
-
-  .date-input .error {
-    color: #dc3545;
-  }
-
   .date-input .mx-datepicker { 
     width: 100%;
+  }
+
+  .date-input .mx-icon-clear {
+    margin-right: 10px;
   }
 
   .date-input .mx-icon-calendar {
