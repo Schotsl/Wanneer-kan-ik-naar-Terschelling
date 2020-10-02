@@ -1,7 +1,8 @@
 <template>
   <div id="app">
-    <Window :open="modalOpen" @closed="closeModal"></Window>
-    <FullCalendar defaultView="dayGridMonth" :events="calendarData" :height=calendarHeight :plugins="calendarPlugins" />
+    <Spinner v-if="vacationLoading"></Spinner>
+    <Window :open="vacationModal" @closed="closeModal"></Window>
+    <FullCalendar defaultView="dayGridMonth" :events="getVacations" :height=calendarHeight :plugins="calendarPlugins" :style="[ vacationLoading ? { opacity: 0.15 } : null ]" />
     <Add @click="openModal"></Add>
   </div>
 </template>
@@ -9,17 +10,19 @@
 <script>
   import Add from './Add';
   import Window from './Window';
+  import Spinner from './Spinner';
 
   import FullCalendar from '@fullcalendar/vue';
   import dayGridPlugin from '@fullcalendar/daygrid';
 
-  import calendarData from './data.json';
+  import axios from 'axios';
 
   export default {
     name: 'App',
 
     components: {
       FullCalendar,
+      Spinner,
       Window,
       Add,
     },
@@ -28,19 +31,17 @@
       return {
         width: 0,
         height: 0,
-        modalOpen: false,
 
-        // Carola: #801515
-        // Geert: #550000
-        // Anne-Marie: #D46A6A
-        // Oma: #FFAAAA
+        vacationArray: [],
+        vacationModal: false,
+        vacationLoading: true,
 
-        calendarData: calendarData,
         calendarPlugins: [ dayGridPlugin ]
       }
     },
 
     mounted() {
+      this.fetchVacations();
       this.$nextTick(() => {
         window.addEventListener('resize', this.onResize);
         this.onResize();
@@ -57,14 +58,34 @@
         this.height = window.innerHeight;
       },
       openModal() {
-        this.modalOpen = true;
+        this.vacationModal = true;
       },
       closeModal() {
-        this.modalOpen = false;
+        this.vacationModal = false;
+      },
+      fetchVacations() {
+        axios.get(`https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation`).then((vacation) =>{
+          this.vacationArray = vacation.data;
+          this.vacationLoading = false;
+        })
       }
     },
 
     computed: {
+      getVacations() {
+        const vacationArray = [];
+
+        this.vacationArray.forEach((vacationObject) => {
+          vacationArray.push({
+            color: vacationObject.color,
+            title: vacationObject.name,
+            start: vacationObject.start,
+            end: vacationObject.ending,
+          });
+        });
+
+        return vacationArray;
+      },
       calendarHeight() {
         return this.height - this.width * 0.08;
       }
