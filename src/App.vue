@@ -1,9 +1,12 @@
 <template>
   <div id="app">
-    <Spinner v-if="vacationLoading"></Spinner>
-    <Window :open="vacationModal" @closed="closeModal"></Window>
-    <FullCalendar defaultView="dayGridMonth" :events="getVacations" :height=calendarHeight :plugins="calendarPlugins" :style="[ vacationLoading ? { opacity: 0.15 } : null ]" />
-    <Add @click="openModal"></Add>
+    <div :class="{ loading : vacationLoading }">
+      <FullCalendar :options="calendarOptions" />
+    </div>
+    
+    <Spinner v-if="vacationLoading" />
+    <Window :open="vacationModal" @closed="closeModal" />
+    <Add @click="openModal" />
   </div>
 </template>
 
@@ -14,6 +17,7 @@
 
   import FullCalendar from '@fullcalendar/vue';
   import dayGridPlugin from '@fullcalendar/daygrid';
+  import interactionPlugin from '@fullcalendar/interaction'
 
   import axios from 'axios';
 
@@ -29,19 +33,27 @@
 
     data() {
       return {
-        width: 0,
-        height: 0,
+        viewportWidth: 0,
+        viewportHeight: 0,
 
-        vacationArray: [],
         vacationModal: false,
         vacationLoading: true,
 
-        calendarPlugins: [ dayGridPlugin ]
+        calendarOptions: {
+          style: 'opacity: 0;',
+          events: [],
+          plugins: [ dayGridPlugin, interactionPlugin ],
+          eventClick: this.handleDateClick,
+          initialView: 'dayGridMonth',
+        }
       }
     },
 
     mounted() {
+      // Fetch the vacations
       this.fetchVacations();
+
+      // Mount viewport size watch
       this.$nextTick(() => {
         window.addEventListener('resize', this.onResize);
         this.onResize();
@@ -54,8 +66,8 @@
 
     methods: {
       onResize() {
-        this.width = window.innerWidth;
-        this.height = window.innerHeight;
+        this.viewportWidth = window.innerWidth;
+        this.viewportHeight = window.innerHeight;
       },
       openModal() {
         this.vacationModal = true;
@@ -64,43 +76,49 @@
         this.vacationModal = false;
       },
       fetchVacations() {
-        axios.get(`https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation`).then((vacation) =>{
-          this.vacationArray = vacation.data;
+        axios.get(`https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation`).then((vacationData) => {
+          const vacationArray = [];
+
+          vacationData.data.forEach((vacationObject) => {
+            vacationArray.push({
+              color: vacationObject.color,
+              title: vacationObject.name,
+              start: vacationObject.start,
+              end: vacationObject.ending,
+              id: vacationObject.id,
+            });
+          });
+
+          this.calendarOptions.events = vacationArray;
           this.vacationLoading = false;
         })
+      },
+      handleDateClick(data) {
+        const id = data.el.fcSeg.eventRange.def.publicId;
       }
     },
 
     computed: {
-      getVacations() {
-        const vacationArray = [];
-
-        this.vacationArray.forEach((vacationObject) => {
-          vacationArray.push({
-            color: vacationObject.color,
-            title: vacationObject.name,
-            start: vacationObject.start,
-            end: vacationObject.ending,
-          });
-        });
-
-        return vacationArray;
-      },
       calendarHeight() {
-        return this.height - this.width * 0.08;
+        return this.viewportHeight - this.viewportWidth * 0.08;
       }
     }
   }
 </script>
 
 <style>
-  @import '~@fullcalendar/core/main.css';
   @import '~@fullcalendar/daygrid/main.css';
 
   html, body {
     margin: 0px;
     height: 100%;
     width: 100%;
+  }
+
+  
+
+  .loading {
+    opacity: 0.15;
   }
 
   #app {

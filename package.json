@@ -9,9 +9,10 @@
   },
   "dependencies": {
     "@bencevans/color-array-average": "^1.0.1",
-    "@fullcalendar/core": "^4.4.2",
-    "@fullcalendar/daygrid": "^4.4.2",
-    "@fullcalendar/vue": "^4.4.2",
+    "@fullcalendar/core": "^5.3.1",
+    "@fullcalendar/daygrid": "^5.3.2",
+    "@fullcalendar/interaction": "^5.3.1",
+    "@fullcalendar/vue": "^5.3.1",
     "axios": "^0.20.0",
     "core-js": "^3.6.5",
     "validator": "^13.1.17",
