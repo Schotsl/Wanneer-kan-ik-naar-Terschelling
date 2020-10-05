@@ -188,6 +188,25 @@
         }
       },
 
+      async updateVacation() {
+        this.resetErrors();
+
+        if (this.validateInput()) {
+          this.loading = true;
+          this.vacation.color = this.averageColor;
+          console.log(this.vacation);
+          await axios({
+            url: `https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation/${this.id}`,
+            data: this.vacation,
+            method: `put`
+          });
+
+          this.loading = false;
+          this.closeModal();
+          this.$emit(`fetch`);
+        }
+      },
+
       async deleteVacation() {
         this.loading = true;
         await axios.delete(`https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation/${this.id}`);
@@ -196,10 +215,6 @@
         this.closeModal();
         this.$emit(`fetch`);
       },
-
-      async updateVacation() {
-
-      }
     },
 
     watch: {
