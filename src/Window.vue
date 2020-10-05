@@ -5,9 +5,9 @@
       <Spinner v-if="loading"></Spinner>
 
       <div :style="[ loading ? { opacity: 0.15 } : null ]">
-        <TextInput :loading="loading" @change="updateName" header="Vakantie titel" subtitle="De titel van de vakantie" :error="errors.name"></TextInput>
-        <DateInput :loading="loading" @change="updateStart" header="Start datum" subtitle="De start datum van de vakantie" :error="errors.start"></DateInput>
-        <DateInput :loading="loading" @change="updateEnding" header="Eind datum" subtitle="De eind datum van de vakantie" :error="errors.ending"></DateInput>
+        <TextInput :loading="loading" :value="vacation.name" @change="updateName" header="Vakantie titel" subtitle="De titel van de vakantie" :error="errors.name"></TextInput>
+        <DateInput :loading="loading" :value="vacation.start" @change="updateStart" header="Start datum" subtitle="De start datum van de vakantie" :error="errors.start"></DateInput>
+        <DateInput :loading="loading" :value="vacation.ending" @change="updateEnding" header="Eind datum" subtitle="De eind datum van de vakantie" :error="errors.ending"></DateInput>
 
         <div class="line"></div>
 
@@ -15,16 +15,16 @@
         <span class="subtitle">Welke families gaan op vakantie</span><br/>
 
         <div class="list-input">
-          <input type="checkbox" id="holst" v-model="family.holst">
+          <input type="checkbox" id="holst" v-model="vacation.family.holst">
           <label for="holst" class="header"> van Holst / Steenmeijer</label><br>
 
-          <input type="checkbox" id="steenmeijer" v-model="family.steenmeijer">
+          <input type="checkbox" id="steenmeijer" v-model="vacation.family.steenmeijer">
           <label for="steenmeijer" class="header"> Steenmeijer / Anoesjka</label><br>
 
-          <input type="checkbox" id="hartman" v-model="family.hartman">
+          <input type="checkbox" id="hartman" v-model="vacation.family.hartman">
           <label for="hartman" class="header"> Hartman / Steenmeijer</label><br>
 
-          <input type="checkbox" id="other" v-model="family.other">
+          <input type="checkbox" id="other" v-model="vacation.family.other">
           <label for="other" class="header"> Anders..</label><br>
         </div>
 
@@ -64,6 +64,12 @@
           name: ``,
           start: ``,
           ending: ``,
+          family: {
+            holst: false,
+            other: false,
+            hartman: false,
+            steenmeijer: false,
+          }
         },
 
         errors: {
@@ -72,17 +78,11 @@
           ending: ``,
           family: ``,
         },
-
-        family: {
-          holst: false,
-          other: false,
-          hartman: false,
-          steenmeijer: false,
-        },
       }
     },
 
     props: {
+      id: String,
       open: Boolean,
     },
 
@@ -91,19 +91,19 @@
         const colorArray = [];
         const averageColor = require('@bencevans/color-array-average');
 
-        if (this.family.holst) colorArray.push(`#f8efd4`);
-        if (this.family.other) colorArray.push(`#edc988`);
-        if (this.family.hartman) colorArray.push(`#de4463`);
-        if (this.family.steenmeijer) colorArray.push(`#821752`);
+        if (this.vacation.family.holst) colorArray.push(`#f8efd4`);
+        if (this.vacation.family.other) colorArray.push(`#edc988`);
+        if (this.vacation.family.hartman) colorArray.push(`#de4463`);
+        if (this.vacation.family.steenmeijer) colorArray.push(`#821752`);
 
         return averageColor(colorArray);
       },
 
       familySelected: function() {
-        return this.family.holst ||
-               this.family.other ||
-               this.family.hartman ||
-               this.family.steenmeijer;
+        return this.vacation.family.holst ||
+               this.vacation.family.other ||
+               this.vacation.family.hartman ||
+               this.vacation.family.steenmeijer;
       }
     },
 
@@ -125,18 +125,40 @@
         this.errors.family = ``;
       },
 
+      resetValues() {
+        this.vacation.name = ``;
+        this.vacation.start = ``;
+        this.vacation.ending = ``;
+        this.vacation.family.holst = ``;
+        this.vacation.family.other = ``;
+        this.vacation.family.hartman = ``;
+        this.vacation.family.steenmeijer = ``;
+      },
+
       validateInput() {
         const validation = require('validator');
 
         if (!validation.isLength(this.vacation.name, {'min': 3, 'max': 255})) this.errors.name = `Vul hier een titel in`;
-        if (!validation.isDate(this.vacation.ending)) this.errors.ending = `Vul hier een eind datum in`;
-        if (!validation.isDate(this.vacation.start)) this.errors.start = `Vul hier een start datum in`;
+        if (!validation.isDate(this.vacation.ending, 'DD-MM-YYYY')) this.errors.ending = `Vul hier een eind datum in`;
+        if (!validation.isDate(this.vacation.start, 'DD-MM-YYYY')) this.errors.start = `Vul hier een start datum in`;
         if (!this.familySelected) this.errors.family = `Selecteer een of meerdere families`
 
         return this.errors.name.length === 0 &&
                this.errors.start.length === 0 &&
                this.errors.ending.length === 0 &&
                this.errors.family.length === 0; 
+      },
+
+      async getVacation() {
+        this.loading = true;
+
+        const vacation = await axios.get(`https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation/${this.id}`);
+        
+        this.loading = false;
+        this.vacation.name = vacation.data.name;
+        this.vacation.start = vacation.data.start;
+        this.vacation.ending = vacation.data.ending;
+        this.vacation.family = vacation.data.family;
       },
 
       async createVacation() {
@@ -158,13 +180,20 @@
         });
 
         // Once we're done loading disable spinner
+        this.resetValues();
         this.loading = false;
       }
     },
 
     watch: {
       open: function() {
-        if (this.open) this.$modal.show('modal');
+        if (this.open) {
+          this.$modal.show('modal');
+
+          if (this.id) {
+            this.getVacation()
+          }
+        }
       }
     }
   }

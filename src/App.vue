@@ -5,7 +5,7 @@
     </div>
     
     <Spinner v-if="vacationLoading" />
-    <Window :open="vacationModal" @closed="closeModal" />
+    <Window :open="vacationModal" @closed="closeModal" :id="vacationId" />
     <Add @click="openModal" />
   </div>
 </template>
@@ -36,11 +36,11 @@
         viewportWidth: 0,
         viewportHeight: 0,
 
+        vacationId: '',
         vacationModal: false,
         vacationLoading: true,
 
         calendarOptions: {
-          style: 'opacity: 0;',
           events: [],
           plugins: [ dayGridPlugin, interactionPlugin ],
           eventClick: this.handleDateClick,
@@ -80,11 +80,14 @@
           const vacationArray = [];
 
           vacationData.data.forEach((vacationObject) => {
+            const endingArray = vacationObject.ending.split(`-`);
+            const startArray = vacationObject.start.split(`-`);
+
             vacationArray.push({
+              start: new Date(startArray[2], startArray[1] - 1, startArray[0]),
+              end: new Date(endingArray[2], endingArray[1] - 1, endingArray[0]),
               color: vacationObject.color,
               title: vacationObject.name,
-              start: vacationObject.start,
-              end: vacationObject.ending,
               id: vacationObject.id,
             });
           });
@@ -94,7 +97,8 @@
         })
       },
       handleDateClick(data) {
-        const id = data.el.fcSeg.eventRange.def.publicId;
+        this.vacationId = data.el.fcSeg.eventRange.def.publicId;
+        this.vacationModal = true;
       }
     },
 

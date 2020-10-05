@@ -1,7 +1,7 @@
 <template>
   <div class="date-input">
     <span class="header">{{ header }}</span>
-    <date-picker :disabled="loading" :class="{ border : error }" @change="change" v-model="content"></date-picker>
+    <date-picker :disabled="loading" :class="{ border : error }" format='DD-MM-YYYY' @change="change" v-model="content" valueType="format"></date-picker>
 
     <span v-if="error" class="error">{{ error }}</span>
     <span v-if="!error" class="subtitle">{{ subtitle }}</span>
@@ -24,6 +24,7 @@
 
     props: {
       error: String,
+      value: !String,
       header: String,
       loading: Boolean,
       subtitle: String,
@@ -36,6 +37,14 @@
     methods: {
       change: function() {
         this.$emit('change', this.content);
+      }
+    },
+
+    watch: {
+      value: function(value) {
+        if (value) this.content = value;
+        // console.log(value);
+        // console.log(this.$refs.date.currentValue);
       }
     }
   }

@@ -19,6 +19,7 @@
     },
 
     props: {
+      value: String,
       error: String,
       header: String,
       loading: Boolean,
@@ -28,6 +29,12 @@
     methods: {
       change: function() {
         this.$emit('change', this.content);
+      }
+    },
+
+    watch: {
+      value: function(value) {
+        this.content = value;
       }
     }
   }
