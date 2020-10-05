@@ -1,6 +1,6 @@
 <template>
   <div id="window">
-    <modal name="modal" height="auto" classes="modal" :focusTrap="loading" @closed="$emit('closed')">
+    <modal name="modal" height="auto" classes="modal" :focusTrap="loading" @closed="closeModal">
       
       <Spinner v-if="loading"></Spinner>
 
@@ -31,7 +31,9 @@
         <span v-if="errors.family" class="error">{{ errors.family }}</span>
         <div class="line"></div>
 
-        <button :disabled="loading" class="fc-button-primary" @click="createVacation">Vakantie toevoegen</button>
+        <button :disabled="loading" v-if="id" class="fc-button-primary" @click="deleteVacation">Vakantie verwijderen</button>
+        <button :disabled="loading" v-if="id" class="fc-button-primary" @click="updateVacation" style="margin-top: 21px;">Vakantie bijwerken</button>
+        <button :disabled="loading" v-if="!id" class="fc-button-primary" @click="createVacation">Vakantie toevoegen</button>
       </div>
 
     </modal>
@@ -135,6 +137,12 @@
         this.vacation.family.steenmeijer = ``;
       },
 
+      closeModal() {
+        this.resetValues();
+        this.resetErrors();
+        this.$emit('closed');
+      },
+
       validateInput() {
         const validation = require('validator');
 
@@ -162,37 +170,45 @@
       },
 
       async createVacation() {
-        // Clear the old errors
         this.resetErrors();
 
-        // Check for new errors
-        if (!this.validateInput()) return;
+        if (this.validateInput()) {
+          this.loading = true;
+          this.vacation.color = this.averageColor;
 
-        // Start the loading
+          await axios({
+            url: `https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation`,
+            data: this.vacation,
+            method: `post`
+          });
+
+          this.loading = false;
+          this.closeModal();
+          this.$emit(`fetch`);
+        }
+      },
+
+      async deleteVacation() {
         this.loading = true;
-        this.vacation.color = this.averageColor;
-
-        // Send creation process
-        await axios({
-          url: `https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation`,
-          data: this.vacation,
-          method: `post`
-        });
-
-        // Once we're done loading disable spinner
-        this.resetValues();
+        await axios.delete(`https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation/${this.id}`);
+        
         this.loading = false;
+        this.closeModal();
+        this.$emit(`fetch`);
+      },
+
+      async updateVacation() {
+
       }
     },
 
     watch: {
       open: function() {
         if (this.open) {
-          this.$modal.show('modal');
-
-          if (this.id) {
-            this.getVacation()
-          }
+          this.$modal.show(`modal`);
+          if (this.id) this.getVacation();
+        } else {
+          this.$modal.hide(`modal`);
         }
       }
     }

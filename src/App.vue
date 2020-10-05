@@ -5,7 +5,7 @@
     </div>
     
     <Spinner v-if="vacationLoading" />
-    <Window :open="vacationModal" @closed="closeModal" :id="vacationId" />
+    <Window :open="vacationModal" @closed="closeModal" @fetch="fetchVacations" :id="vacationId" />
     <Add @click="openModal" />
   </div>
 </template>
@@ -76,6 +76,8 @@
         this.vacationModal = false;
       },
       fetchVacations() {
+        this.vacationLoading = true;
+
         axios.get(`https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation`).then((vacationData) => {
           const vacationArray = [];
 
