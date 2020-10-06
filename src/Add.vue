@@ -17,7 +17,7 @@
     bottom: 4vw;
     height: 75px;
     z-index: 1;
-    position: absolute;
+    position: fixed;
 
     color: white;
     cursor: pointer;

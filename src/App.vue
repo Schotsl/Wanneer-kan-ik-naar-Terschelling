@@ -155,4 +155,16 @@
     background-color: #933735 !important;
     border-color: #731d1d !important;
   }
+
+  .fc-toolbar-chunk { display: flex; }
+  .fc-event-title { margin: 5px 8px; }
+  .fc-event-time { display: none; }
+
+  .fc-button-group,
+  .fc-today-button {
+    margin-bottom: 6px !important;
+  }
+
+  .fade-enter-active, .fade-leave-active { transition: opacity 2.5s; }
+  .fade-enter, .fade-leave-to { opacity: 0; }
 </style>
