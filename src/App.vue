@@ -1,10 +1,12 @@
 <template>
   <div id="app">
-    <div class="height" :class="{ loading : vacationLoading }">
+    <div class="height fade-leave-active" :class="{ loading : vacationLoading }">
       <FullCalendar ref="calendar" :options="calendarOptions" />
     </div>
     
-    <Spinner v-if="vacationLoading" />
+    <transition name="fade">
+      <Spinner v-if="vacationLoading" />
+    </transition>
 
     <transition name="fade">
       <div v-if="isAllowed">
@@ -55,10 +57,10 @@
       }
     },
 
-    mounted() {
+    async mounted() {
       // Fetch the vacations
       this.vacationLoading = true;
-      this.fetchVacations();
+      await this.fetchVacations();
       this.vacationLoading = false;
       this.fetchIp();
 
@@ -98,7 +100,9 @@
       },
 
       handleDateClick(dateObject) {
-        if (dateObject.el.fcSeg.eventRange.def.publicId !== `null`) {
+        const vacationId = dateObject.el.fcSeg.eventRange.def.publicId;
+
+        if (vacationId && vacationId !== `null`) {
           this.vacationId = dateObject.el.fcSeg.eventRange.def.publicId;
           this.vacationModal = true;
         }
@@ -189,7 +193,7 @@
   }
 
   /* Plus button transition */
-  .fade-enter-active, .fade-leave-active { transition: opacity 2.5s; }
+  .fade-enter-active, .fade-leave-active { transition: opacity 1.5s; }
   .fade-enter, .fade-leave-to { opacity: 0; }
 
   /* FullCalendar mobile styling */
