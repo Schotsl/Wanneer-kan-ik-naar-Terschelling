@@ -5,8 +5,13 @@
     </div>
     
     <Spinner v-if="vacationLoading" />
-    <Window :open="vacationModal" :id="vacationId" @closed="closeModal" @update="updateVacation" @create="createVacation" @delete="deleteVacation" />
-    <Add @click="openModal" />
+
+    <transition name="fade">
+      <div v-if="isAllowed">
+        <Window :open="vacationModal" :id="vacationId" @closed="closeModal" @update="updateVacation" @create="createVacation" @delete="deleteVacation" />
+        <Add @click="openModal" />
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -33,6 +38,7 @@
 
     data() {
       return {
+        viewportIp: ``,
         viewportWidth: 0,
         viewportHeight: 0,
 
@@ -54,6 +60,7 @@
       this.vacationLoading = true;
       this.fetchVacations();
       this.vacationLoading = false;
+      this.fetchIp();
 
       // Mount viewport size watch
       this.$nextTick(() => {
@@ -97,6 +104,11 @@
         this.calendarOptions.events = vacations.data.map(vacationObject => ({ ...vacationObject, end: this.toDate(vacationObject.end), start: this.toDate(vacationObject.start) }));
       },
 
+      async fetchIp() {
+        const results = await axios.get(`https://api.ipify.org?format=json`);
+        this.viewportIp = results.data.ip;
+      },
+
       async createVacation(vacation) {
         this.vacationLoading = true;
         await axios({ url: `https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation`, data: vacation, method: `post` });
@@ -116,12 +128,15 @@
         await axios.delete(`https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation/${vacation.id}`);
         await this.fetchVacations();
         this.vacationLoading = false;
-      }
+      },
     },
 
     computed: {
       calendarHeight() {
         return this.viewportHeight - this.viewportWidth * 0.08;
+      },
+      isAllowed() {
+        return this.viewportIp === `80.61.199.248`;
       }
     }
   }
