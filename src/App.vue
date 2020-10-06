@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <div :class="{ loading : vacationLoading }">
-      <FullCalendar :options="calendarOptions" />
+    <div class="height" :class="{ loading : vacationLoading }">
+      <FullCalendar ref="calendar" :options="calendarOptions" />
     </div>
     
     <Spinner v-if="vacationLoading" />
@@ -21,6 +21,8 @@
   import Spinner from './Spinner';
 
   import FullCalendar from '@fullcalendar/vue';
+
+  import listPlugin from '@fullcalendar/list';
   import dayGridPlugin from '@fullcalendar/daygrid';
   import interactionPlugin from '@fullcalendar/interaction'
 
@@ -39,18 +41,16 @@
     data() {
       return {
         viewportIp: ``,
-        viewportWidth: 0,
-        viewportHeight: 0,
-
         vacationId: '',
         vacationModal: false,
         vacationLoading: true,
 
         calendarOptions: {
+          height: '100%',
           events: [],
-          plugins: [ dayGridPlugin, interactionPlugin ],
+          plugins: [ dayGridPlugin, interactionPlugin, listPlugin ],
           eventClick: this.handleDateClick,
-          initialView: 'dayGridMonth',
+          initialView: 'listWeek',
         }
       }
     },
@@ -75,8 +75,11 @@
 
     methods: {
       onResize() {
-        this.viewportWidth = window.innerWidth;
-        this.viewportHeight = window.innerHeight;
+        if (window.innerHeight > window.innerWidth) {
+          this.$refs.calendar.getApi().changeView('listWeek');
+        } else {
+          this.$refs.calendar.getApi().changeView('dayGridMonth');
+        }
       },
 
       openModal() {
@@ -134,9 +137,6 @@
     },
 
     computed: {
-      calendarHeight() {
-        return this.viewportHeight - this.viewportWidth * 0.08;
-      },
       isAllowed() {
         return this.viewportIp === `80.61.199.248`;
       }
@@ -153,16 +153,18 @@
     width: 100%;
   }
 
-  .loading {
-    opacity: 0.15;
-  }
-
+  .loading { opacity: 0.15; }
+  .height { height: 100%; }
+ 
   #app {
     font-family: Avenir, Helvetica, Arial, sans-serif;
     color: #2c3e50;
-    padding: 4vw;
+    
+    padding: 2vh;
+    height: 96vh;
   }
 
+  /* FullCalendar global style fixes */
   .fc-day-grid-event {
     line-height: 1.8;
     padding-left: 6px;
@@ -182,6 +184,22 @@
     margin-bottom: 6px !important;
   }
 
+  /* Plus button transition */
   .fade-enter-active, .fade-leave-active { transition: opacity 2.5s; }
   .fade-enter, .fade-leave-to { opacity: 0; }
+
+  /* FullCalendar mobile styling */
+  @media (orientation: portrait) {
+    .fc-toolbar-title { 
+      font-size: 1em !important; 
+    }
+
+    .fc-header-toolbar {
+      margin-bottom: 1vh !important;
+    }
+  }
+
+  .fc-list {
+    border: none !important;
+  }
 </style>
