@@ -5,9 +5,9 @@
       <Spinner v-if="loading"></Spinner>
 
       <div :style="[ loading ? { opacity: 0.15 } : null ]">
-        <TextInput :loading="loading" :value="vacation.name" @change="updateName" header="Vakantie titel" subtitle="De titel van de vakantie" :error="errors.name"></TextInput>
+        <TextInput :loading="loading" :value="vacation.title" @change="updateTitle" header="Vakantie titel" subtitle="De titel van de vakantie" :error="errors.title"></TextInput>
         <DateInput :loading="loading" :value="vacation.start" @change="updateStart" header="Start datum" subtitle="De start datum van de vakantie" :error="errors.start"></DateInput>
-        <DateInput :loading="loading" :value="vacation.ending" @change="updateEnding" header="Eind datum" subtitle="De eind datum van de vakantie" :error="errors.ending"></DateInput>
+        <DateInput :loading="loading" :value="vacation.end" @change="updateEnd" header="Eind datum" subtitle="De eind datum van de vakantie" :error="errors.end"></DateInput>
 
         <div class="line"></div>
 
@@ -63,9 +63,9 @@
         loading: false,
 
         vacation: {
+          end: ``,
           name: ``,
           start: ``,
-          ending: ``,
           family: {
             holst: false,
             other: false,
@@ -75,9 +75,9 @@
         },
 
         errors: {
+          end: ``,
           name: ``,
           start: ``,
-          ending: ``,
           family: ``,
         },
       }
@@ -110,27 +110,27 @@
     },
 
     methods: {
-      updateName(name) {
-        this.vacation.name = name;
+      updateTitle(title) {
+        this.vacation.title = title;
       },
       updateStart(start) {
         this.vacation.start = start;
       },
-      updateEnding(ending) {
-        this.vacation.ending = ending;
+      updateEnd(end) {
+        this.vacation.end = end;
       },
 
       resetErrors() {
-        this.errors.name = ``;
+        this.errors.end = ``;
+        this.errors.title = ``;
         this.errors.start = ``;
-        this.errors.ending = ``;
         this.errors.family = ``;
       },
 
       resetValues() {
-        this.vacation.name = ``;
+        this.vacation.end = ``;
         this.vacation.start = ``;
-        this.vacation.ending = ``;
+        this.vacation.title = ``;
         this.vacation.family.holst = ``;
         this.vacation.family.other = ``;
         this.vacation.family.hartman = ``;
@@ -146,14 +146,14 @@
       validateInput() {
         const validation = require('validator');
 
-        if (!validation.isLength(this.vacation.name, {'min': 3, 'max': 255})) this.errors.name = `Vul hier een titel in`;
-        if (!validation.isDate(this.vacation.ending, 'DD-MM-YYYY')) this.errors.ending = `Vul hier een eind datum in`;
+        if (!validation.isDate(this.vacation.end, 'DD-MM-YYYY')) this.errors.end = `Vul hier een eind datum in`;
         if (!validation.isDate(this.vacation.start, 'DD-MM-YYYY')) this.errors.start = `Vul hier een start datum in`;
+        if (!validation.isLength(this.vacation.title, {'min': 3, 'max': 255})) this.errors.title = `Vul hier een titel in`;
         if (!this.familySelected) this.errors.family = `Selecteer een of meerdere families`
 
-        return this.errors.name.length === 0 &&
+        return this.errors.end.length === 0 &&
+               this.errors.title.length === 0 &&
                this.errors.start.length === 0 &&
-               this.errors.ending.length === 0 &&
                this.errors.family.length === 0; 
       },
 
@@ -163,9 +163,9 @@
         const vacation = await axios.get(`https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation/${this.id}`);
         
         this.loading = false;
-        this.vacation.name = vacation.data.name;
+        this.vacation.end = vacation.data.end;
         this.vacation.start = vacation.data.start;
-        this.vacation.ending = vacation.data.ending;
+        this.vacation.title = vacation.data.title;
         this.vacation.family = vacation.data.family;
       },
 
@@ -173,47 +173,27 @@
         this.resetErrors();
 
         if (this.validateInput()) {
-          this.loading = true;
           this.vacation.color = this.averageColor;
-
-          await axios({
-            url: `https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation`,
-            data: this.vacation,
-            method: `post`
-          });
-
-          this.loading = false;
+          this.$emit(`create`, this.vacation);
           this.closeModal();
-          this.$emit(`fetch`);
         }
       },
 
-      async updateVacation() {
+      updateVacation() {
         this.resetErrors();
 
         if (this.validateInput()) {
-          this.loading = true;
+          this.vacation.id = this.id;
           this.vacation.color = this.averageColor;
-          console.log(this.vacation);
-          await axios({
-            url: `https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation/${this.id}`,
-            data: this.vacation,
-            method: `put`
-          });
-
-          this.loading = false;
+          this.$emit(`update`, this.vacation);
           this.closeModal();
-          this.$emit(`fetch`);
         }
       },
 
-      async deleteVacation() {
-        this.loading = true;
-        await axios.delete(`https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation/${this.id}`);
-        
-        this.loading = false;
+      deleteVacation() {
+        this.vacation.id = this.id;
+        this.$emit(`delete`, this.vacation);
         this.closeModal();
-        this.$emit(`fetch`);
       },
     },
 

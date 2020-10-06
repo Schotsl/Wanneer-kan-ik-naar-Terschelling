@@ -1,12 +1,12 @@
 <template>
-  <div id="add" @click="$emit('click')">
+  <div id="add" @click="$emit(`click`)">
     +
   </div>
 </template>
 
 <script>
   export default {
-    name: 'Add',
+    name: `Add`,
   }
 </script>
 

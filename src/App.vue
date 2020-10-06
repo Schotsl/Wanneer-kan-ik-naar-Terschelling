@@ -5,7 +5,7 @@
     </div>
     
     <Spinner v-if="vacationLoading" />
-    <Window :open="vacationModal" @closed="closeModal" @fetch="fetchVacations" :id="vacationId" />
+    <Window :open="vacationModal" :id="vacationId" @closed="closeModal" @update="updateVacation" @create="createVacation" @delete="deleteVacation" />
     <Add @click="openModal" />
   </div>
 </template>
@@ -51,13 +51,15 @@
 
     mounted() {
       // Fetch the vacations
+      this.vacationLoading = true;
       this.fetchVacations();
+      this.vacationLoading = false;
 
       // Mount viewport size watch
       this.$nextTick(() => {
         window.addEventListener('resize', this.onResize);
         this.onResize();
-      })
+      });
     },
 
     beforeDestroy() { 
@@ -69,38 +71,51 @@
         this.viewportWidth = window.innerWidth;
         this.viewportHeight = window.innerHeight;
       },
+
       openModal() {
         this.vacationModal = true;
       },
+
       closeModal() {
         this.vacationModal = false;
+        this.vacationId = null;
       },
-      fetchVacations() {
-        this.vacationLoading = true;
 
-        axios.get(`https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation`).then((vacationData) => {
-          const vacationArray = [];
-
-          vacationData.data.forEach((vacationObject) => {
-            const endingArray = vacationObject.ending.split(`-`);
-            const startArray = vacationObject.start.split(`-`);
-
-            vacationArray.push({
-              start: new Date(startArray[2], startArray[1] - 1, startArray[0]),
-              end: new Date(endingArray[2], endingArray[1] - 1, endingArray[0]),
-              color: vacationObject.color,
-              title: vacationObject.name,
-              id: vacationObject.id,
-            });
-          });
-
-          this.calendarOptions.events = vacationArray;
-          this.vacationLoading = false;
-        })
+      toDate(dateString) {
+        const dateArray = dateString.split(`-`);
+        const dateObject = new Date(dateArray[2], dateArray[1] - 1, dateArray[0]);
+        return dateObject;
       },
-      handleDateClick(data) {
-        this.vacationId = data.el.fcSeg.eventRange.def.publicId;
+
+      handleDateClick(dateObject) {
+        this.vacationId = dateObject.el.fcSeg.eventRange.def.publicId;
         this.vacationModal = true;
+      },
+
+      async fetchVacations() {
+        const vacations = await axios.get(`https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation`);
+        this.calendarOptions.events = vacations.data.map(vacationObject => ({ ...vacationObject, end: this.toDate(vacationObject.end), start: this.toDate(vacationObject.start) }));
+      },
+
+      async createVacation(vacation) {
+        this.vacationLoading = true;
+        await axios({ url: `https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation`, data: vacation, method: `post` });
+        await this.fetchVacations();
+        this.vacationLoading = false;
+      },
+
+      async updateVacation(vacation) {
+        this.vacationLoading = true;
+        await axios({ url: `https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation/${vacation.id}`, data: vacation, method: `put` });
+        await this.fetchVacations();
+        this.vacationLoading = false;
+      },
+
+      async deleteVacation(vacation) {
+        this.vacationLoading = true;
+        await axios.delete(`https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation/${vacation.id}`);
+        await this.fetchVacations();
+        this.vacationLoading = false;
       }
     },
 
@@ -120,8 +135,6 @@
     height: 100%;
     width: 100%;
   }
-
-  
 
   .loading {
     opacity: 0.15;
