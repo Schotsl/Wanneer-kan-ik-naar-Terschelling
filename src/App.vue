@@ -153,6 +153,10 @@
     width: 100%;
   }
 
+  input {
+    color: rgb(85, 85, 85) !important;
+  }
+
   .loading { opacity: 0.15; }
   .height { height: 100%; }
  

@@ -4,7 +4,7 @@
       
       <Spinner v-if="loading"></Spinner>
 
-      <div :style="[ loading ? { opacity: 0.15 } : null ]">
+      <div class="container" :style="[ loading ? { opacity: 0.15 } : null ]">
         <TextInput :loading="loading" :value="vacation.title" @change="updateTitle" header="Vakantie titel" subtitle="De titel van de vakantie" :error="errors.title"></TextInput>
         <DateInput :loading="loading" :value="vacation.start" @change="updateStart" header="Start datum" subtitle="De start datum van de vakantie" :error="errors.start"></DateInput>
         <DateInput :loading="loading" :value="vacation.end" @change="updateEnd" header="Eind datum" subtitle="De eind datum van de vakantie" :error="errors.end"></DateInput>
@@ -31,9 +31,11 @@
         <span v-if="errors.family" class="error">{{ errors.family }}</span>
         <div class="line"></div>
 
-        <button :disabled="loading" v-if="id" class="fc-button-primary" @click="deleteVacation">Vakantie verwijderen</button>
-        <button :disabled="loading" v-if="id" class="fc-button-primary" @click="updateVacation" style="margin-top: 21px;">Vakantie bijwerken</button>
-        <button :disabled="loading" v-if="!id" class="fc-button-primary" @click="createVacation">Vakantie toevoegen</button>
+        <div class="button-container">
+          <button :disabled="loading" v-if="id" class="fc-button-primary" @click="deleteVacation">Vakantie verwijderen</button>
+          <button :disabled="loading" v-if="id" class="fc-button-primary second-button" @click="updateVacation">Vakantie bijwerken</button>
+          <button :disabled="loading" v-if="!id" class="fc-button-primary" @click="createVacation">Vakantie toevoegen</button>
+        </div>
       </div>
 
     </modal>
@@ -249,6 +251,10 @@
     border-radius: 5px;
   }
 
+  .second-button {
+    margin-top: 21px;
+  }
+
   .line {
     margin-top: 21px;
     margin-bottom: 21px;
@@ -256,4 +262,51 @@
   }
 
   .modal { padding: 10px 25px 25px 25px; }
+
+  /* Mobile styling */
+  
+  @media (orientation: portrait) {
+    .modal {
+      left: 5% !important;
+      width: 90% !important;
+      height: auto !important;
+      
+      padding-left: 15px !important;
+      padding-right: 15px !important;
+    }
+
+    .header { font-size: 18px; }
+    .subtitle { font-size: 15px; }
+    .second-button { margin-top: 11px; }
+    .button-container { margin-top: 16px; }
+
+    label {
+      font-size: 16px !important;
+    }
+
+    .text-input, 
+    .date-input {
+      margin: 8px 0px;
+    }
+
+    .text-input input,
+    .date-input input {
+      margin: 4px 0px !important;
+    }
+
+    .line {
+      margin-top: 11px;
+      margin-bottom: 11px;
+    }
+
+    .text-input input,
+    .mx-input-wrapper input {
+      padding: 6px 10px !important;
+    }
+
+    .fc-button-primary {
+      font-size: 20px;
+      padding: 8px
+    }
+  }
 </style>
