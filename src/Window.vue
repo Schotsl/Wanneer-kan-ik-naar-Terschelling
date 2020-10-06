@@ -93,10 +93,10 @@
         const colorArray = [];
         const averageColor = require('@bencevans/color-array-average');
 
-        if (this.vacation.family.holst) colorArray.push(`#f8efd4`);
-        if (this.vacation.family.other) colorArray.push(`#edc988`);
-        if (this.vacation.family.hartman) colorArray.push(`#de4463`);
-        if (this.vacation.family.steenmeijer) colorArray.push(`#821752`);
+        if (this.vacation.family.holst) colorArray.push(`#960019`);
+        if (this.vacation.family.other) colorArray.push(`#B80F0A`);
+        if (this.vacation.family.hartman) colorArray.push(`#C21807`);
+        if (this.vacation.family.steenmeijer) colorArray.push(`#B22222`);
 
         return averageColor(colorArray);
       },

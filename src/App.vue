@@ -95,13 +95,15 @@
       },
 
       handleDateClick(dateObject) {
-        this.vacationId = dateObject.el.fcSeg.eventRange.def.publicId;
-        this.vacationModal = true;
+        if (dateObject.el.fcSeg.eventRange.def.publicId !== `null`) {
+          this.vacationId = dateObject.el.fcSeg.eventRange.def.publicId;
+          this.vacationModal = true;
+        }
       },
 
       async fetchVacations() {
         const vacations = await axios.get(`https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation`);
-        this.calendarOptions.events = vacations.data.map(vacationObject => ({ ...vacationObject, end: this.toDate(vacationObject.end), start: this.toDate(vacationObject.start) }));
+        this.calendarOptions.events = vacations.data.map(vacationObject => ({ ...vacationObject, display: 'block', end: this.toDate(vacationObject.end), start: this.toDate(vacationObject.start) }));
       },
 
       async fetchIp() {
