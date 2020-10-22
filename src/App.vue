@@ -99,8 +99,8 @@
         const dateObject = new Date(dateArray[2], dateArray[1] - 1, dateArray[0]);
 
         // Add days to Date object
-        const dateString = dateObject.getDate() + dayOffset;
-        dateObject.setDate(dateString);
+        const parsedString = dateObject.getDate() + dayOffset;
+        dateObject.setDate(parsedString);
 
         return dateObject;
       },
