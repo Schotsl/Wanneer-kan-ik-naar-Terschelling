@@ -43,8 +43,6 @@
     watch: {
       value: function(value) {
         if (value) this.content = value;
-        // console.log(value);
-        // console.log(this.$refs.date.currentValue);
       }
     }
   }

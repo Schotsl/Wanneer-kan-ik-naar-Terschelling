@@ -93,9 +93,15 @@
         this.vacationId = null;
       },
 
-      toDate(dateString) {
+      toDate(dateString, dayOffset) {
+        // Parse string into Date object
         const dateArray = dateString.split(`-`);
         const dateObject = new Date(dateArray[2], dateArray[1] - 1, dateArray[0]);
+
+        // Add days to Date object
+        const dateString = dateObject.getDate() + dayOffset;
+        dateObject.setDate(dateString);
+
         return dateObject;
       },
 
@@ -110,7 +116,7 @@
 
       async fetchVacations() {
         const vacations = await axios.get(`https://us-central1-wanneer-naar-terschellin-ba99f.cloudfunctions.net/app/api/v1/vacation`);
-        this.calendarOptions.events = vacations.data.map(vacationObject => ({ ...vacationObject, display: 'block', end: this.toDate(vacationObject.end), start: this.toDate(vacationObject.start) }));
+        this.calendarOptions.events = vacations.data.map(vacationObject => ({ ...vacationObject, display: 'block', end: this.toDate(vacationObject.end, 1), start: this.toDate(vacationObject.start, 0) }));
       },
 
       async fetchIp() {
