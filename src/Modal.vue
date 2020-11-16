@@ -1,13 +1,16 @@
 <template>
-  <div id="window">
-    <modal name="modal" height="auto" classes="modal" :focusTrap="loading" @closed="closeModal">
-      
+  <div>
+    <!-- Background and escape of the modal -->
+    <div class="modal-container" @click="closeModal"></div>
+
+    <!-- The modal and the actual content -->
+    <div class="modal-content" :style="styleHeight">
       <Spinner v-if="loading"></Spinner>
 
-      <div class="container" :style="[ loading ? { opacity: 0.15 } : null ]">
-        <TextInput :loading="loading" :value="vacation.title" @change="updateTitle" header="Vakantie titel" subtitle="De titel van de vakantie" :error="errors.title"></TextInput>
-        <DateInput :loading="loading" :value="vacation.start" @change="updateStart" header="Start datum" subtitle="De start datum van de vakantie" :error="errors.start"></DateInput>
-        <DateInput :loading="loading" :value="vacation.end" @change="updateEnd" header="Eind datum" subtitle="De eind datum van de vakantie" :error="errors.end"></DateInput>
+      <div :style="[ loading ? { opacity: 0.15 } : null ]">
+        <TextInput placeholder="Titel" :loading="loading" :value="vacation.title" @change="updateTitle" header="Vakantie titel" subtitle="De titel van de vakantie" :error="errors.title"></TextInput>
+        <TextInput placeholder="23/04/2000" :loading="loading" :value="vacation.start" @change="updateStart" header="Start datum" subtitle="De start datum van de vakantie" :error="errors.start"></TextInput>
+        <TextInput placeholder="26/04/2000" :loading="loading" :value="vacation.end" @change="updateEnd" header="Eind datum" subtitle="De eind datum van de vakantie" :error="errors.end"></TextInput>
 
         <div class="line"></div>
 
@@ -37,27 +40,22 @@
           <button :disabled="loading" v-if="!id" class="fc-button-primary" @click="createVacation">Vakantie toevoegen</button>
         </div>
       </div>
-
-    </modal>
+    </div>
   </div>
 </template>
 
 <script>
-  import 'vue-js-modal/dist/styles.css';
-
   import TextInput from './Text';
-  import DateInput from './Date';
   import Spinner from './Spinner';
 
   import axios from 'axios';
 
   export default {
-    name: 'Window',
+    name: 'Modal',
 
     components: {
-      Spinner,
       TextInput,
-      DateInput,
+      Spinner,
     },
 
     data() {
@@ -87,10 +85,15 @@
 
     props: {
       id: String,
-      open: Boolean,
+      height: Number,
     },
 
     computed: {
+      styleHeight: function() {
+        const height = Math.round(this.height / 2);
+        return `top: ${height}px`;
+      },
+
       averageColor: function() {
         const colorArray = [];
         const averageColor = require('@bencevans/color-array-average');
@@ -116,10 +119,18 @@
         this.vacation.title = title;
       },
       updateStart(start) {
+        this.errors.start = ``;
         this.vacation.start = start;
+
+        const validation = require('validator');
+        if (!validation.isDate(start, 'DD/MM/YYYY')) this.errors.start = `Vul een geldige start datum in`;
       },
       updateEnd(end) {
+        this.errors.end = ``;
         this.vacation.end = end;
+
+        const validation = require('validator');
+        if (!validation.isDate(end, 'DD/MM/YYYY')) this.errors.start = `Vul een geldige eind datum in`;
       },
 
       resetErrors() {
@@ -148,8 +159,8 @@
       validateInput() {
         const validation = require('validator');
 
-        if (!validation.isDate(this.vacation.end, 'DD-MM-YYYY')) this.errors.end = `Vul hier een eind datum in`;
-        if (!validation.isDate(this.vacation.start, 'DD-MM-YYYY')) this.errors.start = `Vul hier een start datum in`;
+        if (!validation.isLength(this.vacation.end, {'min': 3, 'max': 255})) this.errors.end = `Vul hier een eind datum in`;
+        if (!validation.isLength(this.vacation.start, {'min': 3, 'max': 255})) this.errors.start = `Vul hier een start datum in`;
         if (!validation.isLength(this.vacation.title, {'min': 3, 'max': 255})) this.errors.title = `Vul hier een titel in`;
         if (!this.familySelected) this.errors.family = `Selecteer een of meerdere families`
 
@@ -199,20 +210,38 @@
       },
     },
 
-    watch: {
-      open: function() {
-        if (this.open) {
-          this.$modal.show(`modal`);
-          if (this.id) this.getVacation();
-        } else {
-          this.$modal.hide(`modal`);
-        }
-      }
+    mounted() {
+      if (this.id) this.getVacation();
     }
   }
 </script>
 
 <style>
+  /* Styling for the modal background */
+  .modal-container {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+
+    z-index: 2;
+    background-color: rgba(0,0,0,0.4);
+  }
+
+  /* Styling for the modal itself */
+  .modal-content {
+    left: 50%;
+    width: 80%;
+    border: 1px solid #888;
+    padding: 20px;
+    position: absolute;
+    transform: translate(-50%,-50%);
+
+    z-index: 3;
+    background-color: #fefefe;
+  }
+
   /* Styling for input containers */
   .text-input,
   .date-input { margin: 15px 0; }
@@ -265,16 +294,7 @@
 
   /* Mobile styling */
   
-  @media (orientation: portrait) {
-    .modal {
-      left: 5% !important;
-      width: 90% !important;
-      height: auto !important;
-      
-      padding-left: 15px !important;
-      padding-right: 15px !important;
-    }
-
+  @media only screen and (max-width: 600px) {
     .header { font-size: 18px; }
     .subtitle { font-size: 15px; }
     .second-button { margin-top: 11px; }
@@ -306,7 +326,8 @@
 
     .fc-button-primary {
       font-size: 20px;
-      padding: 8px
+      padding: 8px;
     }
   }
+
 </style>

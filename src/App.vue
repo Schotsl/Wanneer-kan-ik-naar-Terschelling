@@ -8,18 +8,14 @@
       <Spinner v-if="vacationLoading" />
     </transition>
 
-    <transition name="fade">
-      <div v-if="isAllowed">
-        <Window :open="vacationModal" :id="vacationId" @closed="closeModal" @update="updateVacation" @create="createVacation" @delete="deleteVacation" />
-        <Add @click="openModal" />
-      </div>
-    </transition>
+    <Modal v-if="vacationModal" :height="viewportHeight" :id="vacationId" @closed="closeModal" @update="updateVacation" @create="createVacation" @delete="deleteVacation"></Modal>
+    <Add v-if="isAllowed" @click="openModal" />
   </div>
 </template>
 
 <script>
   import Add from './Add';
-  import Window from './Window';
+  import Modal from './Modal';
   import Spinner from './Spinner';
 
   import FullCalendar from '@fullcalendar/vue';
@@ -36,13 +32,16 @@
     components: {
       FullCalendar,
       Spinner,
-      Window,
+      Modal,
       Add,
     },
 
     data() {
       return {
         viewportIp: ``,
+        viewportWidth: 0,
+        viewportHeight: 0,
+
         vacationId: '',
         vacationModal: false,
         vacationLoading: true,
@@ -58,6 +57,9 @@
     },
 
     async mounted() {
+      this.viewportWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+      this.viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+
       // Fetch the vacations
       this.vacationLoading = true;
       await this.fetchVacations();
@@ -173,8 +175,7 @@
   #app {
     font-family: Avenir, Helvetica, Arial, sans-serif;
     color: #2c3e50;
-    
-    padding: 2vh;
+    padding: 15px;
     height: 96vh;
   }
 
@@ -203,7 +204,7 @@
   .fade-enter, .fade-leave-to { opacity: 0; }
 
   /* FullCalendar mobile styling */
-  @media (orientation: portrait) {
+  @media only screen and (max-width: 600px) {
     .fc-toolbar-title { 
       font-size: 1em !important; 
     }

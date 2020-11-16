@@ -18,9 +18,7 @@
     "core-js": "^3.6.5",
     "validator": "^13.1.17",
     "vue": "^2.6.11",
-    "vue-headful": "^2.1.0",
-    "vue-js-modal": "^2.0.0-rc.6",
-    "vue2-datepicker": "^3.6.2"
+    "vue-headful": "^2.1.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.4.0",

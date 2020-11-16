@@ -1,7 +1,7 @@
 <template>
   <div class="text-input">
     <span class="header">{{ header }}</span>
-    <input :disabled="loading" :class="{ border : error }" @change="change" type="text" v-model="content">
+    <input :placeholder="placeholder" :disabled="loading" :class="{ border : error }" @change="change" type="text" v-model="content">
 
     <span v-if="error" class="error">{{ error }}</span>
     <span v-if="!error" class="subtitle">{{ subtitle }}</span>
@@ -24,6 +24,7 @@
       header: String,
       loading: Boolean,
       subtitle: String,
+      placeholder: String,
     },
 
     methods: {
