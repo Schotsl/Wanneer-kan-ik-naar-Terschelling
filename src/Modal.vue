@@ -8,9 +8,9 @@
       <Spinner v-if="loading"></Spinner>
 
       <div :style="[ loading ? { opacity: 0.15 } : null ]">
-        <TextInput placeholder="Titel" :loading="loading" :value="vacation.title" @change="updateTitle" header="Vakantie titel" subtitle="De titel van de vakantie" :error="errors.title"></TextInput>
-        <TextInput placeholder="23/04/2000" :loading="loading" :value="vacation.start" @change="updateStart" header="Start datum" subtitle="De start datum van de vakantie" :error="errors.start"></TextInput>
-        <TextInput placeholder="26/04/2000" :loading="loading" :value="vacation.end" @change="updateEnd" header="Eind datum" subtitle="De eind datum van de vakantie" :error="errors.end"></TextInput>
+        <TextInput placeholder="Titel" :loading="loading" :value="vacation.title" @enter="updateVacation" @change="updateTitle" header="Vakantie titel" subtitle="De titel van de vakantie" :error="errors.title"></TextInput>
+        <TextInput placeholder="23/04/2000" :loading="loading" :value="vacation.start" @enter="updateVacation" @change="updateStart" header="Start datum" subtitle="De start datum van de vakantie" :error="errors.start"></TextInput>
+        <TextInput placeholder="26/04/2000" :loading="loading" :value="vacation.end" @enter="updateVacation" @change="updateEnd" header="Eind datum" subtitle="De eind datum van de vakantie" :error="errors.end"></TextInput>
 
         <div class="line"></div>
 
@@ -64,7 +64,7 @@
 
         vacation: {
           end: ``,
-          name: ``,
+          title: ``,
           start: ``,
           family: {
             holst: false,
@@ -76,7 +76,7 @@
 
         errors: {
           end: ``,
-          name: ``,
+          title: ``,
           start: ``,
           family: ``,
         },
@@ -130,7 +130,7 @@
         this.vacation.end = end;
 
         const validation = require('validator');
-        if (!validation.isDate(end, 'DD/MM/YYYY')) this.errors.start = `Vul een geldige eind datum in`;
+        if (!validation.isDate(end, 'DD/MM/YYYY')) this.errors.end = `Vul een geldige eind datum in`;
       },
 
       resetErrors() {
@@ -162,6 +162,10 @@
         if (!validation.isLength(this.vacation.end, {'min': 3, 'max': 255})) this.errors.end = `Vul hier een eind datum in`;
         if (!validation.isLength(this.vacation.start, {'min': 3, 'max': 255})) this.errors.start = `Vul hier een start datum in`;
         if (!validation.isLength(this.vacation.title, {'min': 3, 'max': 255})) this.errors.title = `Vul hier een titel in`;
+
+        if (!validation.isDate(this.vacation.end, 'DD/MM/YYYY')) this.errors.end = `Vul een geldige eind datum in`;
+        if (!validation.isDate(this.vacation.start, 'DD/MM/YYYY')) this.errors.start = `Vul een geldige start datum in`;
+        
         if (!this.familySelected) this.errors.family = `Selecteer een of meerdere families`
 
         return this.errors.end.length === 0 &&
@@ -293,30 +297,38 @@
   .modal { padding: 10px 25px 25px 25px; }
 
   /* Mobile styling */
-  
   @media only screen and (max-width: 600px) {
-    .header { font-size: 18px; }
-    .subtitle { font-size: 15px; }
+    .header { font-size: 16px; }
+    .modal-content { width: 75%; }
     .second-button { margin-top: 11px; }
     .button-container { margin-top: 16px; }
 
-    label {
-      font-size: 16px !important;
+    input,
+    label,
+    button { 
+      font-size: 12px !important; 
     }
+
+    .error, 
+    .subtitle { font-size: 14px; }
 
     .text-input, 
     .date-input {
       margin: 8px 0px;
     }
 
+    .text-input:first-of-type {
+      margin-top: 0px;
+    }
+
     .text-input input,
     .date-input input {
-      margin: 4px 0px !important;
+      margin: 2px 0px !important;
     }
 
     .line {
-      margin-top: 11px;
-      margin-bottom: 11px;
+      margin-top: 9px;
+      margin-bottom: 9px;
     }
 
     .text-input input,

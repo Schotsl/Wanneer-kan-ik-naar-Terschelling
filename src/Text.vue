@@ -1,7 +1,7 @@
 <template>
   <div class="text-input">
     <span class="header">{{ header }}</span>
-    <input :placeholder="placeholder" :disabled="loading" :class="{ border : error }" @change="change" type="text" v-model="content">
+    <input :placeholder="placeholder" :disabled="loading" :class="{ border : error }" @keyup="change" @keyup.enter="enter" type="text" v-model="content">
 
     <span v-if="error" class="error">{{ error }}</span>
     <span v-if="!error" class="subtitle">{{ subtitle }}</span>
@@ -30,6 +30,10 @@
     methods: {
       change: function() {
         this.$emit('change', this.content);
+      },
+
+      enter: function() {
+        this.$emit('enter');
       }
     },
 
