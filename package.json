@@ -16,6 +16,7 @@
     "@fullcalendar/vue": "^5.3.1",
     "axios": "^0.20.0",
     "core-js": "^3.6.5",
+    "highlight.js": "^10.4.1",
     "validator": "^13.1.17",
     "vue": "^2.6.11",
     "vue-headful": "^2.1.0"
