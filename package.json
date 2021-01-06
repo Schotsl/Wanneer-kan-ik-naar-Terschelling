@@ -14,7 +14,7 @@
     "@fullcalendar/interaction": "^5.3.1",
     "@fullcalendar/list": "^5.3.1",
     "@fullcalendar/vue": "^5.3.1",
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "highlight.js": "^10.4.1",
     "validator": "^13.1.17",
